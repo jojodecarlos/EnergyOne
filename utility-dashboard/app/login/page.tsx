@@ -8,7 +8,7 @@ export default function LoginPage() {
     <main className="min-h-screen grid grid-cols-1 md:grid-cols-2">
       
       {/* LEFT COLUMN: White background, centers everything inside it */}
-      <div className="flex flex-col justify-start items-center bg-white p-12 sm:p-30">
+      <div className="flex flex-col justify-center items-center bg-white p-12 sm:p-30">
         {/* Inner container to keep the form from getting too wide */}
         <div className="w-full max-w-md flex flex-col items-center space-y-10">
           
@@ -16,7 +16,7 @@ export default function LoginPage() {
           <BrandHeader />
           
          {/* SLOT 2: Developer 2's Login Form goes here <LoginForm /> */}
-
+          <LoginForm />
         </div>
       </div>
 
