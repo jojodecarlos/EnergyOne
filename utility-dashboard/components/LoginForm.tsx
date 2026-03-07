@@ -32,18 +32,18 @@ export default function LoginForm() {
 
             <div className="relative flex space-x-3">
                 <Image
-                    src="/images/UsernameIcon.png"
-                    alt="Username Icon"
+                    src="/images/EmailIcon.png"
+                    alt="Email Icon"
                     width={30}
                     height={30}
                     className="absolute inset-y-2 left-3 flex items-center 
                     pointer-events-none"
                 />
                 <input 
-                    type="text" 
+                    type="email"
                     id="username" 
                     name="username" 
-                    placeholder="Username"
+                    placeholder="Email"
                     onChange={(e) => setEmail(e.target.value)}
                     className="w-full rounded-full border border-gray-700 px-5 py-3
                     text-md text-gray-500 focus:outline-none focus:ring-2 font-inter
