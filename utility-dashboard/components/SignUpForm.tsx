@@ -57,12 +57,15 @@ export default function SignUpForm() {
         const user = data.user;
 
         if(user){
-            const{error} = await supabase.from("user_settings").upsert({
-                user_id: user.id,
-                first_name: firstName,
-                last_name: lastName,
-                email: email,
-            });
+            // Updated block: securely targets the row created by the backend trigger
+            const { error } = await supabase
+                .from("user_settings")
+                .update({
+                    first_name: firstName,
+                    last_name: lastName,
+                    email: email,
+                })
+                .eq("user_id", user.id);
 
             if(error){
                 alert(error.message);
@@ -206,5 +209,3 @@ export default function SignUpForm() {
         </form>
     );
 }
-
-        
