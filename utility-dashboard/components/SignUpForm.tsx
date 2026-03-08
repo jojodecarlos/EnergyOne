@@ -15,7 +15,27 @@ export default function SignUpForm() {
     const [password, setPassword] = useState("");
     const [passwordConfirm, setPasswordConfirm] = useState("");
 
+    const validatepassword = (password: string) => {
+        const minLength = 8;
+        const specialChar = /[!@#$%^&*(),.?":{}|<>]/;
+        if (password.length < minLength) {
+            return false;
+        }
+        if (!specialChar.test(password)) {
+            return false;
+        }
+        return true;
+    }
+
     const handleSignUp = async () => {
+        if (!firstName.trim() || !lastName.trim() || !email.trim() || !emailConfirm.trim() || !password || !passwordConfirm) {
+        alert("Please fill in all fields");
+        return;
+        }
+        if (!validatepassword(password)) {
+            alert("Password must be at least 8 characters and contain at least one special character");
+            return;
+        }
         if (email !== emailConfirm) {
             alert("Emails do not match");
             return;
@@ -24,6 +44,7 @@ export default function SignUpForm() {
             alert("Passwords do not match");
             return;
         }
+        
         const {data, error} = await supabase.auth.signUp({
             email: email,
             password: password,
@@ -90,7 +111,7 @@ export default function SignUpForm() {
                     className="absolute inset-y-3 left-3 flex items-center
                     pointer-events-none"
                 />
-        
+    
                 <input 
                     type="email"
                     id="email"
@@ -112,7 +133,6 @@ export default function SignUpForm() {
                     className="absolute inset-y-3 left-3 flex items-center
                     pointer-events-none"
                 />
-
                 <input 
                     type="email"
                     id="emailConfirm"
@@ -134,7 +154,6 @@ export default function SignUpForm() {
                     className="absolute inset-y-1 left-3 flex items-center 
                     pointer-events-none"
                 />
-
                 <input 
                     type="password"
                     id="password"
