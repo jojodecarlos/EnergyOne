@@ -61,7 +61,6 @@ export default function SignUpForm() {
                 user_id: user.id,
                 first_name: firstName,
                 last_name: lastName,
-                username: email,
                 email: email,
             });
 
@@ -71,7 +70,7 @@ export default function SignUpForm() {
             }
         }
 
-        router.push("/confirmation");
+        router.push("/signup/confirmation");
     }
 
     return(
