@@ -57,7 +57,7 @@ export default function SignUpForm() {
         const user = data.user;
 
         if(user){
-            const{error} = await supabase.from("user_settings").insert({
+            const{error} = await supabase.from("user_settings").upsert({
                 user_id: user.id,
                 first_name: firstName,
                 last_name: lastName,
