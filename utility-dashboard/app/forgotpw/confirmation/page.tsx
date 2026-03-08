@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import SimpleHeader from '@/components/SimpleHeader';
 import ForgotPasswordSuccess from '@/components/ForgotPasswordSuccess';
 
@@ -13,7 +14,9 @@ export default function ForgotPasswordPage() {
       {/* 2. The Centered Form Container */}
       <div className="w-full max-w-md flex flex-col items-center text-center mt-16 sm:mt-0">
         
-        <ForgotPasswordSuccess />
+        <Suspense fallback={<div>Loading...</div>}>
+          <ForgotPasswordSuccess />
+        </Suspense>
         
       </div>
 
