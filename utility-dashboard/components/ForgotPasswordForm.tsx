@@ -22,7 +22,7 @@ export default function ForgotPasswordForm() {
         redirectTo: `${window.location.origin}/reset-password`,
       });
 
-      // Supabase often returns success even if the email doesn't exist (good for privacy)
+      
       if (error) throw error;
 
       router.push(`/forgotpw/confirmation?email=${encodeURIComponent(email.trim())}`);
@@ -89,7 +89,6 @@ export default function ForgotPasswordForm() {
 }
 
 function MailSpeedIcon({ className }: { className?: string }) {
-  // simple bold icon similar to prototype (no deps)
   return (
     <svg
       className={className}
