@@ -42,7 +42,7 @@ export default function DashboardHeader() {
         <a
           href=""
           className={`px-4 py-2 rounded-full ${
-            pathname === "/portfolio"
+            pathname === ""
               ? "bg-[#1F7A5A] text-white shadow-md"
               : "hover:bg-gray-200 transition duration-300"
           }`}
@@ -53,7 +53,7 @@ export default function DashboardHeader() {
         <a
           href=""
           className={`px-4 py-2 rounded-full ${
-            pathname === "/reports"
+            pathname === ""
               ? "bg-[#1F7A5A] text-white shadow-md"
               : "hover:bg-gray-200 transition duration-300"
           }`}
@@ -64,7 +64,7 @@ export default function DashboardHeader() {
         <a
           href=""
           className={`px-4 py-2 rounded-full ${
-            pathname === "/settings"
+            pathname === ""
               ? "bg-[#1F7A5A] text-white shadow-md"
               : "hover:bg-gray-200 transition duration-300"
           }`}
