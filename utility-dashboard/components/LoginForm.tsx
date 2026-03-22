@@ -12,7 +12,10 @@ export default function LoginForm() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
-    const handleLogin = async () => {
+    // 1. Added React.FormEvent to handle standard form submissions
+    const handleLogin = async (e: React.FormEvent) => {
+        // Prevents the browser from reloading the page natively
+        e.preventDefault();
 
         const { error } = await supabase.auth.signInWithPassword({
             email,
@@ -24,11 +27,16 @@ export default function LoginForm() {
             return;
         }
 
-        router.push("/");
+        // 2. Updated to push directly to the dashboard
+        router.push("/dashboard"); 
+        
+        // 3. Forces Next.js to update the server components with the new auth state
+        router.refresh(); 
     };
     
     return(
-        <form className="w-full max-w-md">
+        // 4. Moved the handler to the form's onSubmit event
+        <form onSubmit={handleLogin} className="w-full max-w-md">
 
             <div className="relative flex space-x-3">
                 <Image
@@ -36,18 +44,15 @@ export default function LoginForm() {
                     alt="Email Icon"
                     width={30}
                     height={30}
-                    className="absolute inset-y-2 left-3 flex items-center 
-                    pointer-events-none"
+                    className="absolute inset-y-2 left-3 flex items-center pointer-events-none"
                 />
                 <input 
                     type="email"
-                    id="username" 
-                    name="username" 
+                    id="email" // Updated ID to match standard email autofill
+                    name="email" 
                     placeholder="Email"
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full rounded-full border border-gray-700 px-5 py-3
-                    text-md text-gray-500 focus:outline-none focus:ring-2 font-inter
-                    focus:ring-blue-800 pl-12" 
+                    className="w-full rounded-full border border-gray-700 px-5 py-3 text-md text-gray-500 focus:outline-none focus:ring-2 font-inter focus:ring-blue-800 pl-12" 
                 />
             </div>
 
@@ -57,8 +62,7 @@ export default function LoginForm() {
                     alt="Password Icon"
                     width={30}
                     height={30}
-                    className="absolute inset-y-1 left-3 flex items-center 
-                    pointer-events-none"
+                    className="absolute inset-y-1 left-3 flex items-center pointer-events-none"
                 />
 
                 <input 
@@ -67,9 +71,7 @@ export default function LoginForm() {
                     name="password" 
                     placeholder="Password"
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full px-5 py-3 border border-gray-700
-                    rounded-full text-md text-gray-500 focus:outline-none 
-                    focus:ring-2 focus:ring-blue-500 font-inter pl-12"
+                    className="w-full px-5 py-3 border border-gray-700 rounded-full text-md text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 font-inter pl-12"
                 />
             </div>
 
@@ -83,13 +85,10 @@ export default function LoginForm() {
                 </button>
             </div>
 
+            {/* 5. Changed from type="button" to type="submit" */}
             <button 
-                type="button"
-                onClick={handleLogin}
-                className="
-                w-full bg-[#002A84] hover:bg-blue-600 
-                text-white font-bold py-2 px-4 rounded-full 
-                shadow-md hover:bg-blue-900 transition duration-300"
+                type="submit"
+                className="w-full bg-[#002A84] hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-full shadow-md hover:bg-blue-900 transition duration-300"
             >
                 SIGN IN
             </button>

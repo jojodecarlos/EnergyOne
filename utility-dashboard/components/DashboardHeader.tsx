@@ -1,84 +1,66 @@
-"use client";
+"use client"; 
 
-import { usePathname } from "next/navigation";
-import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { useRouter, usePathname } from "next/navigation";
 import { supabase } from "@/lib/supabase";
-import { useState } from "react";
 
 export default function DashboardHeader() {
-
-  const pathname = usePathname();
   const router = useRouter();
+  
+  const pathname = usePathname();
 
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-    router.push("/login");
-  }
+  const handleLogOut = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      console.error("Error logging out:", error.message);
+      alert("There was an issue logging out. Please try again.");
+      return;
+    }
+    router.push("/");
+    router.refresh();
+  };
+
+  const getLinkStyle = (path: string) => {
+    const isActive = pathname.startsWith(path);
+    return isActive
+      ? "px-5 py-2 text-sm font-medium text-white bg-[#2c7a5b] rounded-full shadow-sm"
+      : "px-5 py-2 text-sm font-medium text-gray-900 hover:bg-gray-100 rounded-full transition";
+  };
 
   return (
-    <div className="p-4 flex justify-between items-center mt-1">
+    <header className="flex justify-between items-center w-full max-w-7xl mx-auto p-8 bg-white">
       
-      <h1 className="w-fit text-[58px] w-[486px] font-inter font-black italic leading-none tracking-tight">
-        <span className="text-blue-800">Orlando Energy</span>
-        <span className="text-[#1F7A5A]"> ONE</span>
-      </h1>
+      <div className="text-3xl font-extrabold italic leading-none tracking-tight">
+        <span className="text-[#002A84]">Orlando Energy </span>
+        <span className="text-[#107c54]">ONE</span>
+      </div>
 
-      <div className="w-fit text-black gap-7 
-      text-[24px] w-[99px] font-inter 
-      border border-solid border-black rounded-full 
-      px-4 py-2 font-md">
-
-        <a
-          href="/dashboard"
-          className={`px-4 py-2 rounded-full ${
-            pathname === "/dashboard"
-              ? "bg-[#1F7A5A] text-white shadow-md"
-              : "hover:bg-gray-200 transition duration-300"
-          }`}
-        >
+      <nav className="flex items-center bg-white border border-gray-800 rounded-full px-1 py-1 shadow-sm">
+        
+        <Link href="/dashboard" className={getLinkStyle('/dashboard')}>
           Dashboard
-        </a>
-
-        <a
-          href=""
-          className={`px-4 py-2 rounded-full ${
-            pathname === ""
-              ? "bg-[#1F7A5A] text-white shadow-md"
-              : "hover:bg-gray-200 transition duration-300"
-          }`}
-        >
+        </Link>
+        
+        <Link href="/portfolio" className={getLinkStyle('/portfolio')}>
           View Portfolio
-        </a>
+        </Link>
 
-        <a
-          href=""
-          className={`px-4 py-2 rounded-full ${
-            pathname === ""
-              ? "bg-[#1F7A5A] text-white shadow-md"
-              : "hover:bg-gray-200 transition duration-300"
-          }`}
-        >
+        <Link href="/reports" className={getLinkStyle('/reports')}>
           Reports
-        </a>
+        </Link>
 
-        <a
-          href=""
-          className={`px-4 py-2 rounded-full ${
-            pathname === ""
-              ? "bg-[#1F7A5A] text-white shadow-md"
-              : "hover:bg-gray-200 transition duration-300"
-          }`}
-        >
+        <Link href="/settings" className={getLinkStyle('/settings')}>
           Settings
-        </a>
+        </Link>
 
-        <button
-          onClick={handleLogout}
-          className="rounded-full px-4 py-2 hover:bg-red-700 hover:text-white hover:cursor-pointer transition duration-300"
+        <button 
+          onClick={handleLogOut}
+          className="px-5 py-2 text-sm font-medium text-gray-900 hover:bg-gray-100 rounded-full transition ml-2"
         >
           Log Out
         </button>
-      </div>
-    </div>
+        
+      </nav>
+    </header>
   );
 }
