@@ -12,12 +12,23 @@ export default function PropertyMetricsFields() {
 
   const handleSubmit = async () => {
 
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) {
+      alert("User not logged in");
+      return;
+    }
+
     const { error } = await supabase.from("properties").insert([
       {
-        property_type: propertyType,
-        gross_floor_area: parseInt(floorArea),
+        primary_use_type: propertyType,
+        building_size_sqft: parseInt(floorArea),
         weekly_operating_hours: parseInt(hours),
-        number_of_workers: parseInt(workers)
+        number_of_workers: parseInt(workers),
+
+        // required fields
+        property_address: "Test Address", // placeholder
+        user_id: user.id
       }
     ]);
 

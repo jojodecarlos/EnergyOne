@@ -1,9 +1,45 @@
 "use client";
 
+import { useState, useEffect } from "react";
+import { supabase } from "@/lib/supabase";
+
 export default function Recommendations() {
 
-  // placeholder score (change const score to test each level)
-  const score = 70;
+  const [score, setScore] = useState<number | null>(null);
+
+  useEffect(() => {
+    const fetchScore = async () => {
+
+      const { data, error } = await supabase
+        .from("performance_scores")
+        .select("energy_star_score")
+        .limit(1);
+
+      if (error) {
+        console.error("Error fetching score:", error.message);
+        return;
+      }
+
+      if (data && data.length > 0) {
+        setScore(data[0].energy_star_score);
+      }
+    };
+
+    fetchScore();
+  }, []);
+
+  if (score === null) {
+    return (
+      <div className="bg-white p-6 rounded-xl shadow-md w-full">
+        <h2 className="text-lg font-semibold mb-4">
+          Energy Efficiency Score
+        </h2>
+        <p className="text-gray-500">
+          No data available yet.
+        </p>
+      </div>
+    );
+  }
 
   let status = "";
   let color = "";
