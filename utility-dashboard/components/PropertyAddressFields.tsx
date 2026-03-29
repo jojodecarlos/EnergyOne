@@ -86,7 +86,10 @@ export function formatAddress({
 
 export default function PropertyAddressFields({
   onChange,
-}: {onChange: (address: string) => void;
+  propertyData, // <-- Added
+}: {
+  onChange: (address: string) => void;
+  propertyData?: any; // <-- Added to satisfy TypeScript
 }) {
   const [form, setForm] = useState({
     address1: "",
