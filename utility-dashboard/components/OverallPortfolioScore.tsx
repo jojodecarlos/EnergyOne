@@ -50,7 +50,7 @@ function calculateAverageScore(properties: Property[]): number | null {
 export default function OverallPortfolioScore({
   properties,
 }: OverallPortfolioScoreProps) {
-  const averageScore = null;
+  const averageScore = calculateAverageScore(properties);
   const ringColor = averageScore !== null ? getScoreColor(averageScore) : "#D1D5DB";
 
   const data = {
