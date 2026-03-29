@@ -1,20 +1,27 @@
-interface SettingsActionRowProps {
-  icon: string;
+"use client";
+
+interface Props {
   title: string;
   description: string;
-  onClick: () => void;
-  actionIcon: string;
-  iconColor?: string;
+  onClick?: () => void;
 }
 
-export default function SettingsActionRow({ title, description, onClick }: SettingsActionRowProps) {
+export default function SettingsActionRow({
+  title,
+  description,
+  onClick,
+}: Props) {
   return (
-    <button 
+    <div
       onClick={onClick}
-      className="w-full text-left mb-6 p-6 border-2 border-dashed border-green-400 rounded-3xl bg-green-50 hover:bg-green-100 transition-colors"
+      className="flex items-center justify-between bg-white rounded-2xl shadow-sm px-5 h-[72px] hover:shadow-md transition cursor-pointer"
     >
-      <h2 className="text-xl font-bold text-green-900">{title} (Action Button)</h2>
-      <p className="text-sm text-green-700">{description}</p>
-    </button>
+      <div>
+        <p className="font-semibold text-gray-900">{title}</p>
+        <p className="text-sm text-gray-500">{description}</p>
+      </div>
+
+      <span className="text-gray-400 text-lg">⌄</span>
+    </div>
   );
 }

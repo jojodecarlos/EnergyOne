@@ -1,22 +1,43 @@
-import { ReactNode } from "react";
+"use client";
 
-interface SettingsAccordionProps {
-  icon: string;
+import { useState } from "react";
+
+interface Props {
   title: string;
   description: string;
-  children: ReactNode;
+  children: React.ReactNode;
 }
 
-export default function SettingsAccordion({ title, description, children }: SettingsAccordionProps) {
+export default function SettingsAccordion({
+  title,
+  description,
+  children,
+}: Props) {
+  const [open, setOpen] = useState(false);
+
   return (
-    <div className="mb-6 p-6 border-2 border-dashed border-blue-400 rounded-3xl bg-blue-50">
-      <h2 className="text-xl font-bold text-blue-900">{title} (Accordion Wrapper)</h2>
-      <p className="text-sm text-blue-700 mb-4">{description}</p>
-      
-      {/* This renders the DisplaySettingsPanel inside the box */}
-      <div className="bg-white p-4 rounded-xl border border-blue-200">
-        {children}
+    <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
+
+      {/* HEADER SAME HEIGHT */}
+      <div
+        onClick={() => setOpen(!open)}
+        className="flex items-center justify-between px-5 h-[72px] cursor-pointer hover:shadow-md transition"
+      >
+        <div>
+          <p className="font-semibold text-gray-900">{title}</p>
+          <p className="text-sm text-gray-500">{description}</p>
+        </div>
+
+        <span className="text-gray-400 text-lg">
+          {open ? "⌃" : "⌄"}
+        </span>
       </div>
+
+      {open && (
+        <div className="px-5 pb-5 pt-3 border-t bg-gray-50">
+          {children}
+        </div>
+      )}
     </div>
   );
 }

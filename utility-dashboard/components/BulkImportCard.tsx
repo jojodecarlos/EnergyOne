@@ -17,7 +17,6 @@ export default function BulkImportCard() {
         console.log("Parsed CSV:", parsedData);
         setData(parsedData);
 
-        // get logged in user
         const { data: userData } = await supabase.auth.getUser();
         const userId = userData.user?.id;
 
@@ -26,17 +25,21 @@ export default function BulkImportCard() {
           return;
         }
 
-        // insert into properties table
-        const { error } = await supabase.from("properties").insert(
-          parsedData.map((row, index) => ({
-            user_id: userId,
-            property_address: "Imported Property " + index,
-            building_size_sqft: Number(row.gross_floor_area),
-            primary_use_type: row.property_type,
-            weekly_operating_hours: Number(row.weekly_operating_hours),
-            number_of_workers: Number(row.number_of_workers),
-          }))
-        );
+        const formattedData = parsedData.map((row, index) => ({
+          user_id: userId,
+          property_address: row.property_address || "Imported Property " + index,
+
+          // safer mapping
+          building_size_sqft: Number(row.gross_floor_area || row.building_size_sqft || 0),
+          primary_use_type: row.property_type || row.primary_use_type || "Unknown",
+
+          weekly_operating_hours: Number(row.weekly_operating_hours || 0),
+          number_of_workers: Number(row.number_of_workers || 0),
+        }));
+
+        const { error } = await supabase
+          .from("properties")
+          .insert(formattedData);
 
         if (error) {
           console.error("Insert error:", error.message);

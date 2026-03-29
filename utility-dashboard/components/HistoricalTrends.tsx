@@ -1,6 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { supabase } from "@/lib/supabase";
+
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -24,15 +26,45 @@ ChartJS.register(
 export default function HistoricalTrends() {
 
   const [range, setRange] = useState("Monthly");
+  const [labels, setLabels] = useState<string[]>([]);
+  const [values, setValues] = useState<number[]>([]);
 
-  const labels = ["Jan", "Feb", "Mar", "Apr", "May", "Jun"];
+  useEffect(() => {
+    const fetchData = async () => {
 
-  const data = {
+      const { data, error } = await supabase
+        .from("performance_scores")
+        .select("report_year, site_eui")
+        .order("report_year", { ascending: true });
+
+      if (error) {
+        console.error("Error fetching data:", error.message);
+        return;
+      }
+
+      if (!data) return;
+
+      const formattedLabels = data.map((item) =>
+        item.report_year.toString()
+      );
+
+      const formattedValues = data.map((item) =>
+        Number(item.site_eui)
+      );
+
+      setLabels(formattedLabels);
+      setValues(formattedValues);
+    };
+
+    fetchData();
+  }, []);
+
+  const chartData = {
     labels,
     datasets: [
       {
         label: "Energy Usage (kWh)",
-        data: [120, 140, 135, 150, 160, 155],
+        data: values,
         borderColor: "#002A84",
         backgroundColor: "rgba(0, 42, 132, 0.2)",
         tension: 0.3
@@ -57,7 +89,7 @@ export default function HistoricalTrends() {
         </select>
       </div>
 
-      <Line data={data} />
+      <Line data={chartData} />
     </div>
   );
 }
