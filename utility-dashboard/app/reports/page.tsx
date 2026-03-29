@@ -1,30 +1,37 @@
-import DashboardHeader from '@/components/DashboardHeader';
-import PropertyConsumptionForm from '@/components/PropertyConsumptionForm';
-import PerformanceChart from '@/components/PerformanceChart';
-import HistoricalEntriesTable from '@/components/HistoricalEntriesTable';
+import DashboardHeader from "@/components/DashboardHeader";
+import HistoricalEntriesTable from "@/components/HistoricalEntriesTable";
+import { supabase } from "@/lib/supabase";
 
-export default function ReportsPage() {
+export default async function ReportsPage() {
+  const { data: meterEntries, error } = await supabase
+    .from("meters")
+    .select("*");
+
+  if (error) {
+    console.error("Error fetching meter entries:", error.message);
+  }
+
+  const safeEntries = meterEntries ?? [];
+
   return (
-    <main className="min-h-screen bg-gray-50 flex flex-col">
-      {/* The Global Navigation */}
+    <main className="min-h-screen bg-[#efefef]">
       <DashboardHeader />
 
-      {/* Main Content Container */}
-      <div className="flex-1 w-full max-w-7xl mx-auto p-4 md:p-8">
-        
-        {/* Responsive Grid: 1 column on mobile, 12 columns on desktop */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+      <div className="mx-auto max-w-7xl px-6 py-8">
+        <div className="space-y-6">
           
-          {/* LEFT COLUMN: Data Entry Form (Takes up 4 out of 12 columns) */}
-          <div className="lg:col-span-4 h-full">
-             <PropertyConsumptionForm />
+          {/* Performance Trends (placeholder stays for now) */}
+          <div className="rounded-[24px] border border-gray-300 bg-white p-4 shadow-sm">
+            <h2 className="mb-4 text-xl font-bold text-black">
+              Performance Trends
+            </h2>
+            <div className="flex h-[220px] items-center justify-center rounded-md bg-gray-100 text-gray-500">
+              PerformanceChart placeholder
+            </div>
           </div>
 
-          {/* RIGHT COLUMN: Charts and Tables (Takes up 8 out of 12 columns) */}
-          <div className="lg:col-span-8 flex flex-col gap-8">
-             <PerformanceChart />
-             <HistoricalEntriesTable />
-          </div>
+          {/* YOUR ACTUAL WORK */}
+          <HistoricalEntriesTable entries={safeEntries} />
 
         </div>
       </div>
