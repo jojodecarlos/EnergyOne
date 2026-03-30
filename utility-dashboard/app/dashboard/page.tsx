@@ -4,19 +4,8 @@ import HistoricalTrends from "@/components/HistoricalTrends";
 import OverallPortfolioScore from "@/components/OverallPortfolioScore";
 import Recommendations from "@/components/Recommendations";
 import PerformanceComparison from "@/components/PerformanceComparison";
-import { supabase } from "@/lib/supabase";
 
-export default async function DashboardPage() {
-  const { data: properties, error } = await supabase
-    .from("properties")
-    .select("*");
-
-  if (error) {
-    console.error("Error fetching properties:", error.message);
-  }
-
-  const safeProperties = properties ?? [];
-
+export default function DashboardPage() {
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
       <DashboardHeader />
@@ -29,7 +18,8 @@ export default async function DashboardPage() {
             <HistoricalTrends />
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <OverallPortfolioScore properties={safeProperties} />
+              {/* Removed the properties prop - it will fetch its own data now! */}
+              <OverallPortfolioScore />
               <Recommendations />
             </div>
           </div>

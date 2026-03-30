@@ -4,10 +4,11 @@ export interface PropertyData {
   id: string;
   name: string;
   address: string;
-  city: string;
-  state: string;
-  zip: string;
-  propertyType: string;
+  city?: string;
+  state?: string;
+  zip?: string;
+  propertyType?: string;
+  buildingSize?: string;
 }
 
 interface PropertySelectorProps {
@@ -33,7 +34,7 @@ export default function PropertySelector({ properties, selectedId, onSelect }: P
           <option value="">+ Create New Property</option>
           {properties.map((prop) => (
             <option key={prop.id} value={prop.id}>
-              {prop.name} - {prop.address}
+              {prop.name}
             </option>
           ))}
         </select>

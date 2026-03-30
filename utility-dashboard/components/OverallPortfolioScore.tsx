@@ -1,5 +1,7 @@
 "use client";
 
+import { useState, useEffect } from "react";
+import { supabase } from "@/lib/supabase";
 import { Doughnut } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -9,15 +11,7 @@ import {
 
 ChartJS.register(ArcElement, Tooltip);
 
-type Property = {
-  id: string | number;
-  score?: number | null;
-};
-
-type OverallPortfolioScoreProps = {
-  properties: Property[];
-};
-
+// Only keep the color and message helpers!
 function getScoreColor(score: number) {
   if (score >= 80) return "#1E9E63";
   if (score >= 60) return "#2563EB";
@@ -36,24 +30,40 @@ function getScoreMessage(score: number | null) {
   return "Low performance. Significant improvement is needed.";
 }
 
-function calculateAverageScore(properties: Property[]): number | null {
-  const validScores = properties
-    .map((property) => property.score)
-    .filter((score): score is number => typeof score === "number" && !Number.isNaN(score));
+export default function OverallPortfolioScore() {
+  const [averageScore, setAverageScore] = useState<number | null>(null);
 
-  if (validScores.length === 0) return null;
+  useEffect(() => {
+    const fetchScores = async () => {
+      // 1. Get the active user
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
 
-  const total = validScores.reduce((sum, score) => sum + score, 0);
-  return Math.round(total / validScores.length);
-}
+      // 2. Fetch all of their scores
+      const { data, error } = await supabase
+        .from("performance_scores")
+        .select("energy_star_score")
+        .eq("user_id", user.id);
 
-export default function OverallPortfolioScore({
-  properties,
-}: OverallPortfolioScoreProps) {
-  const averageScore = calculateAverageScore(properties);
+      if (error || !data) return;
+
+      // 3. Calculate the average directly here instead of using the old helper
+      const validScores = data
+        .map((d) => d.energy_star_score)
+        .filter((score): score is number => typeof score === "number" && !Number.isNaN(score));
+
+      if (validScores.length > 0) {
+        const total = validScores.reduce((sum, score) => sum + score, 0);
+        setAverageScore(Math.round(total / validScores.length));
+      }
+    };
+
+    fetchScores();
+  }, []);
+
   const ringColor = averageScore !== null ? getScoreColor(averageScore) : "#D1D5DB";
 
-  const data = {
+  const chartData = {
     datasets: [
       {
         data: averageScore !== null ? [averageScore, 100 - averageScore] : [0, 100],
@@ -69,7 +79,6 @@ export default function OverallPortfolioScore({
       <h2 className="text-center text-xl font-bold text-black">
         Overall Portfolio Score
       </h2>
-
       <p className="mt-1 text-center text-sm text-gray-500">
         Score as of xx/xx/xxxx
       </p>
@@ -77,14 +86,10 @@ export default function OverallPortfolioScore({
       <div className="mx-auto mt-6 flex w-40 items-center justify-center">
         <div className="relative h-40 w-40">
           <Doughnut
-            data={data}
+            data={chartData}
             options={{
               cutout: "72%",
-              plugins: {
-                legend: {
-                  display: false,
-                },
-              },
+              plugins: { legend: { display: false } },
             }}
           />
           <div className="absolute inset-0 flex items-center justify-center text-4xl font-bold text-black">

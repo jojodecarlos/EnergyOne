@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export const STATES = [
   { label: "Alabama", value: "AL" },
@@ -54,42 +54,12 @@ export const STATES = [
   { label: "Wisconsin", value: "WI" },
   { label: "Wyoming", value: "WY" },
 ];
-
-  type AddressInput = {
-  address1: string;
-  address2?: string;
-  city: string;
-  state: string;
-  zip: string;
-  };
-
-export function formatAddress({
-  address1,
-  address2,
-  city,
-  state,
-  zip,
-}: AddressInput): string {
-  const street = [address1, address2]
-    .map((s) => s?.trim())
-    .filter(Boolean)
-    .join(", ");
-
-  return [
-    street,
-    city?.trim(),
-    state && zip ? `${state} ${zip}` : state || zip,
-  ]
-    .filter(Boolean)
-    .join(", ");
-}
-
 export default function PropertyAddressFields({
   onChange,
-  propertyData, // <-- Added
+  propertyData, 
 }: {
   onChange: (address: string) => void;
-  propertyData?: any; // <-- Added to satisfy TypeScript
+  propertyData?: any;
 }) {
   const [form, setForm] = useState({
     address1: "",
@@ -99,81 +69,80 @@ export default function PropertyAddressFields({
     zip: "",
   });
 
+  useEffect(() => {
+    if (propertyData) {
+      setForm({
+        address1: propertyData.address || "",
+        address2: "", 
+        city: propertyData.city || "",
+        state: propertyData.state || "",
+        zip: propertyData.zip || "",
+      });
+    } else {
+      setForm({ address1: "", address2: "", city: "", state: "", zip: "" });
+    }
+  }, [propertyData]);
+
   const handleChange = (field: keyof typeof form, value: string) => {
     const updated = { ...form, [field]: value };
     setForm(updated);
-    const formatted = formatAddress(updated);
-    onChange(formatted);
+    onChange(updated.address1); 
   }
 
   return (
     <div className="h-96 w-full flex flex-col justify-center text-center p-4 rounded-xl">
-      
       <div className="mt-7 w-full text-black">
-        <input type="text"
-          name="address1"
-          id="AddressLine1" 
+        <input 
+          type="text"
+          value={form.address1} 
           placeholder="Address Line 1"
           onChange={(e) => handleChange("address1", e.target.value)} 
-          className="w-full border border-black bg-[#D9D9D980] 
-          px-4 py-2 text-md text-black 
-          focus:outline-none focus:ring-1 font-inter focus:ring-blue-800" 
+          className="w-full border border-black bg-[#D9D9D980] px-4 py-2 text-black focus:outline-none focus:ring-1 focus:ring-blue-800" 
         />
       </div>
 
       <div className="mt-7 w-full text-black">
-        <input type="text"
-          name="address2" 
-          id="AddressLine2" 
+        <input 
+          type="text"
+          value={form.address2} 
           placeholder="Address Line 2" 
           onChange={(e) => handleChange("address2", e.target.value)}
-          className="w-full border border-black bg-[#D9D9D980]
-          px-4 py-2 text-md text-black 
-          focus:outline-none focus:ring-1 font-inter focus:ring-blue-800" 
+          className="w-full border border-black bg-[#D9D9D980] px-4 py-2 text-black focus:outline-none focus:ring-1 focus:ring-blue-800" 
         />
       </div>
 
       <div className="mt-7 w-full text-black">
-        <input type="text" 
-          name="city"
-          id="City" 
+        <input 
+          type="text" 
+          value={form.city}
           placeholder="City"
           onChange={(e) => handleChange("city", e.target.value)} 
-          className="w-full border border-black bg-[#D9D9D980]
-          px-4 py-2 text-md text-black 
-          focus:outline-none focus:ring-1 font-inter focus:ring-blue-800" 
+          className="w-full border border-black bg-[#D9D9D980] px-4 py-2 text-black focus:outline-none focus:ring-1 focus:ring-blue-800" 
         />
       </div>
 
       <div className="mt-7 w-full text-black">
-        <select name="state" 
-        id="state"
-        onChange={(e) => handleChange("state", e.target.value)}
-        className="w-full h-[40px] border border-black bg-[#D9D9D980]
-        px-4 py-2 text-md text-black 
-        focus:outline-none focus:ring-1 font-inter focus:ring-blue-800"
+        <select 
+          value={form.state} 
+          onChange={(e) => handleChange("state", e.target.value)}
+          className="w-full h-[40px] border border-black bg-[#D9D9D980] px-4 py-2 text-black focus:outline-none focus:ring-1 focus:ring-blue-800"
         >
           <option value="">State</option>
           {STATES.map((state) => (
-          <option key={state.value} value={state.value}>
-          {state.label}
-          </option>
-        ))}
+            <option key={state.value} value={state.value}>{state.label}</option>
+          ))}
         </select>
       </div>
 
       <div className="mt-7 w-full text-black">
-        <input type="text" 
-          name="zip"
-          id="ZIP" 
+        <input 
+          type="text" 
+          value={form.zip}
           placeholder="ZIP" 
           onChange={(e) => handleChange("zip", e.target.value)}
-          className="w-full border border-black bg-[#D9D9D980]
-          px-4 py-2 text-md text-black 
-          focus:outline-none focus:ring-1 font-inter focus:ring-blue-800" 
+          className="w-full border border-black bg-[#D9D9D980] px-4 py-2 text-black focus:outline-none focus:ring-1 focus:ring-blue-800" 
         />
       </div>
-
     </div>
   );
 }
