@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 type ThemeOption = "light" | "dark";
 type FontSizeOption = "small" | "medium" | "large";
@@ -9,6 +9,55 @@ export default function DisplaySettingsPanel() {
   const [theme, setTheme] = useState<ThemeOption>("light");
   const [fontSize, setFontSize] = useState<FontSizeOption>("medium");
   const [highContrast, setHighContrast] = useState(false);
+
+  useEffect(() => {
+    const savedTheme = localStorage.getItem("theme") as ThemeOption | null;
+    const savedFontSize = localStorage.getItem("fontSize") as FontSizeOption | null;
+    const savedHighContrast = localStorage.getItem("highContrast");
+
+    const nextTheme = savedTheme || "light";
+    const nextFontSize = savedFontSize || "medium";
+    const nextHighContrast = savedHighContrast === "true";
+
+    setTheme(nextTheme);
+    setFontSize(nextFontSize);
+    setHighContrast(nextHighContrast);
+
+    applySettings(nextTheme, nextFontSize, nextHighContrast);
+  }, []);
+
+  const applySettings = (
+    selectedTheme: ThemeOption,
+    selectedFontSize: FontSizeOption,
+    selectedHighContrast: boolean
+  ) => {
+    const html = document.documentElement;
+    const body = document.body;
+
+    html.classList.remove(
+      "theme-light",
+      "theme-dark",
+      "font-small",
+      "font-medium",
+      "font-large"
+    );
+    body.classList.remove("high-contrast");
+
+    html.classList.add(`theme-${selectedTheme}`);
+    html.classList.add(`font-${selectedFontSize}`);
+
+    if (selectedHighContrast) {
+      body.classList.add("high-contrast");
+    }
+  };
+
+  const handleSave = () => {
+    localStorage.setItem("theme", theme);
+    localStorage.setItem("fontSize", fontSize);
+    localStorage.setItem("highContrast", String(highContrast));
+
+    applySettings(theme, fontSize, highContrast);
+  };
 
   return (
     <div className="rounded-[24px] border border-gray-300 bg-white p-6 shadow-sm">
@@ -114,7 +163,7 @@ export default function DisplaySettingsPanel() {
 
       <button
         type="button"
-        onClick={() => console.log({ theme, fontSize, highContrast })}
+        onClick={handleSave}
         className="mt-6 rounded-full bg-gray-400 px-6 py-3 text-sm font-semibold text-white transition hover:bg-gray-500"
       >
         Save Display Settings

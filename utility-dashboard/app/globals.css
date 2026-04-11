@@ -24,3 +24,71 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+html.theme-light {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+html.theme-dark {
+  --background: #111827;
+  --foreground: #f9fafb;
+}
+
+html.font-small {
+  font-size: 14px;
+}
+
+html.font-medium {
+  font-size: 16px;
+}
+
+html.font-large {
+  font-size: 18px;
+}
+
+body.high-contrast {
+  filter: contrast(1.35);
+}
+
+html.theme-dark body {
+  background: #111827 !important;
+  color: #f9fafb !important;
+}
+
+html.theme-dark .bg-white,
+html.theme-dark .bg-gray-100,
+html.theme-dark .bg-gray-50,
+html.theme-dark .bg-background {
+  background-color: #1f2937 !important;
+}
+
+html.theme-dark .text-black,
+html.theme-dark .text-gray-900,
+html.theme-dark .text-foreground {
+  color: #f9fafb !important;
+}
+
+html.theme-dark .text-gray-600,
+html.theme-dark .text-gray-500,
+html.theme-dark .text-gray-400 {
+  color: #d1d5db !important;
+}
+
+html.theme-dark .border-gray-300,
+html.theme-dark .border-gray-200,
+html.theme-dark .border-gray-400,
+html.theme-dark .border-gray-800 {
+  border-color: #4b5563 !important;
+}
+
+html.theme-dark select {
+  background-color: #1f2937;
+  color: #f9fafb;
+  border-color: #4b5563;
+}
+
+html.theme-dark option {
+  background-color: #1f2937;
+  color: #f9fafb;
+}
