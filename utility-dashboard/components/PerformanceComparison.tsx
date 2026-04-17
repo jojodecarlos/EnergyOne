@@ -31,87 +31,71 @@ export default function PerformanceComparison() {
   >([]);
 
   useEffect(() => {
+    console.log("PerformanceComparison effect triggered, range:", range);
     const fetchData = async () => {
+      console.log("fetchData started");
       const {
         data: { user },
       } = await supabase.auth.getUser();
-      if (!user) return;
-
-      const today = new Date();
-      let startDate: string, endDate: string;
-
-      if (range === "Monthly") {
-        startDate = new Date(today.getFullYear(), today.getMonth(), 1)
-          .toISOString()
-          .split("T")[0];
-        endDate = new Date(today.getFullYear(), today.getMonth() + 1, 0)
-          .toISOString()
-          .split("T")[0];
-      } else if (range === "Weekly") {
-        const dayOfWeek = today.getDay();
-        const diffToMonday = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
-        const monday = new Date(today);
-        monday.setDate(today.getDate() + diffToMonday);
-        const sunday = new Date(monday);
-        sunday.setDate(monday.getDate() + 6);
-
-        startDate = monday.toISOString().split("T")[0];
-        endDate = sunday.toISOString().split("T")[0];
-      } else {
-        startDate = new Date(today.getFullYear(), 0, 1)
-          .toISOString()
-          .split("T")[0];
-        endDate = new Date(today.getFullYear(), 11, 31)
-          .toISOString()
-          .split("T")[0];
+      if (!user) {
+        console.log("No user");
+        return;
       }
+      console.log("User:", user.id);
 
-      // User properties
-      const { data: properties } = await supabase
+      const { data: properties, error: propError } = await supabase
         .from("properties")
-        .select("id, property_name")
+        .select("id, orlando_building_id")
         .eq("user_id", user.id);
 
-      if (!properties) return;
+      if (propError) {
+        console.error("Properties error:", propError);
+        return;
+      }
+      if (!properties || properties.length === 0) {
+        console.log("No properties");
+        return;
+      }
+      console.log("Properties:", properties);
 
       const propertyIds = properties.map((p) => p.id);
+      console.log("Property IDs:", propertyIds);
 
-      const { data: readings } = await supabase
+      const propertyId = propertyIds[0];
+      console.log("Using propertyId:", propertyId);
+      
+      const { data: readings, error: readingsError } = await supabase
         .from("meter_readings")
         .select("usage_amount, property_id")
-        .gte("start_date", startDate)
-        .lte("end_date", endDate)
-        .in("property_id", propertyIds);
+        .eq("property_id", propertyId);
 
-      if (!readings) return;
+      console.log("Readings:", readings, "Error:", readingsError);
+      if (!readings || readings.length === 0) {
+        console.log("No readings found");
+        return;
+      }
 
-      // Aggregate user data
       const aggregated: Record<string, number> = {};
       readings.forEach((r) => {
         const property = properties.find((p) => p.id === r.property_id);
         if (!property) return;
-        aggregated[property.property_name] =
-          (aggregated[property.property_name] || 0) + r.usage_amount;
+        aggregated["Your Portfolio"] = (aggregated["Your Portfolio"] || 0) + Number(r.usage_amount);
       });
+      console.log("Aggregated:", aggregated);
 
-      // Dynamic baseline scaling
-      const weeklyBaseline = {
-        "Normal Home": 30,
-        Apartment: 20,
-        Bank: 75,
-      };
-      const scaleFactor = range === "Weekly" ? 1 : range === "Monthly" ? 4 : 52;
-      const baselineData = Object.entries(weeklyBaseline).map(
-        ([name, usage]) => ({
-          name,
-          usage: usage * scaleFactor,
-        }),
-      );
+      const portfolioUsage = Object.values(aggregated)[0] || 0;
+      const baselineData = [
+        { name: "Normal Home", usage: portfolioUsage * 0.6 },
+        { name: "Apartment", usage: portfolioUsage * 0.4 },
+        { name: "Bank", usage: portfolioUsage * 1.5 },
+      ];
 
-      setEnergyData([
+      const finalData = [
         ...baselineData,
         ...Object.entries(aggregated).map(([name, usage]) => ({ name, usage })),
-      ]);
+      ];
+      console.log("Final energyData:", finalData);
+      setEnergyData(finalData);
     };
 
     fetchData();
