@@ -24,18 +24,18 @@ export default function DashboardHeader() {
     const isActive = pathname.startsWith(path);
     return isActive
       ? "px-5 py-2 text-sm font-medium text-white bg-[#2c7a5b] rounded-full shadow-sm"
-      : "px-5 py-2 text-sm font-medium text-gray-900 hover:bg-gray-100 rounded-full transition";
+      : "px-5 py-2 text-sm font-medium text-foreground hover:bg-gray-100 rounded-full transition";
   };
 
   return (
-    <header className="flex justify-between items-center w-full max-w-7xl mx-auto p-8 bg-white">
+    <header className="flex justify-between items-center w-full max-w-7xl mx-auto p-8 bg-background">
       
       <div className="text-3xl font-extrabold italic leading-none tracking-tight">
         <span className="text-[#002A84]">Orlando Energy </span>
         <span className="text-[#107c54]">ONE</span>
       </div>
 
-      <nav className="flex items-center bg-white border border-gray-800 rounded-full px-1 py-1 shadow-sm">
+      <nav className="flex items-center bg-background border border-gray-800 rounded-full px-1 py-1 shadow-sm">
         
         <Link href="/dashboard" className={getLinkStyle('/dashboard')}>
           Dashboard
@@ -45,17 +45,13 @@ export default function DashboardHeader() {
           View Portfolio
         </Link>
 
-        <Link href="/reports" className={getLinkStyle('/reports')}>
-          Reports
-        </Link>
-
         <Link href="/settings" className={getLinkStyle('/settings')}>
           Settings
         </Link>
 
         <button 
           onClick={handleLogOut}
-          className="px-5 py-2 text-sm font-medium text-gray-900 hover:bg-gray-100 rounded-full transition ml-2"
+          className="px-5 py-2 text-sm font-medium text-foreground hover:bg-gray-100 rounded-full transition ml-2"
         >
           Log Out
         </button>
