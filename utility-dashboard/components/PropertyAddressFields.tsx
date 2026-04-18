@@ -1,148 +1,55 @@
 "use client";
 
-import { useState, useEffect } from "react";
-
-export const STATES = [
-  { label: "Alabama", value: "AL" },
-  { label: "Alaska", value: "AK" },
-  { label: "Arizona", value: "AZ" },
-  { label: "Arkansas", value: "AR" },
-  { label: "California", value: "CA" },
-  { label: "Colorado", value: "CO" },
-  { label: "Connecticut", value: "CT" },
-  { label: "Delaware", value: "DE" },
-  { label: "Florida", value: "FL" },
-  { label: "Georgia", value: "GA" },
-  { label: "Hawaii", value: "HI" },
-  { label: "Idaho", value: "ID" },
-  { label: "Illinois", value: "IL" },
-  { label: "Indiana", value: "IN" },
-  { label: "Iowa", value: "IA" },
-  { label: "Kansas", value: "KS" },
-  { label: "Kentucky", value: "KY" },
-  { label: "Louisiana", value: "LA" },
-  { label: "Maine", value: "ME" },
-  { label: "Maryland", value: "MD" },
-  { label: "Massachusetts", value: "MA" },
-  { label: "Michigan", value: "MI" },
-  { label: "Minnesota", value: "MN" },
-  { label: "Mississippi", value: "MS" },
-  { label: "Missouri", value: "MO" },
-  { label: "Montana", value: "MT" },
-  { label: "Nebraska", value: "NE" },
-  { label: "Nevada", value: "NV" },
-  { label: "New Hampshire", value: "NH" },
-  { label: "New Jersey", value: "NJ" },
-  { label: "New Mexico", value: "NM" },
-  { label: "New York", value: "NY" },
-  { label: "North Carolina", value: "NC" },
-  { label: "North Dakota", value: "ND" },
-  { label: "Ohio", value: "OH" },
-  { label: "Oklahoma", value: "OK" },
-  { label: "Oregon", value: "OR" },
-  { label: "Pennsylvania", value: "PA" },
-  { label: "Rhode Island", value: "RI" },
-  { label: "South Carolina", value: "SC" },
-  { label: "South Dakota", value: "SD" },
-  { label: "Tennessee", value: "TN" },
-  { label: "Texas", value: "TX" },
-  { label: "Utah", value: "UT" },
-  { label: "Vermont", value: "VT" },
-  { label: "Virginia", value: "VA" },
-  { label: "Washington", value: "WA" },
-  { label: "West Virginia", value: "WV" },
-  { label: "Wisconsin", value: "WI" },
-  { label: "Wyoming", value: "WY" },
-];
 export default function PropertyAddressFields({
+  propertyData,
   onChange,
-  propertyData, 
 }: {
-  onChange: (address: string) => void;
-  propertyData?: any;
+  propertyData: any;
+  onChange: (val: any) => void;
 }) {
-  const [form, setForm] = useState({
-    address1: "",
-    address2: "",
-    city: "",
-    state: "",
-    zip: "",
-  });
 
-  useEffect(() => {
-    if (propertyData) {
-      setForm({
-        address1: propertyData.address || "",
-        address2: "", 
-        city: propertyData.city || "",
-        state: propertyData.state || "",
-        zip: propertyData.zip || "",
-      });
-    } else {
-      setForm({ address1: "", address2: "", city: "", state: "", zip: "" });
-    }
-  }, [propertyData]);
-
-  const handleChange = (field: keyof typeof form, value: string) => {
-    const updated = { ...form, [field]: value };
-    setForm(updated);
-    onChange(updated.address1); 
-  }
+  const handle = (field: string, value: string) => {
+    onChange({ [field]: value });
+  };
 
   return (
     <div className="h-96 w-full flex flex-col justify-center text-center p-4 rounded-xl">
-      <div className="mt-7 w-full text-black">
-        <input 
-          type="text"
-          value={form.address1} 
-          placeholder="Address Line 1"
-          onChange={(e) => handleChange("address1", e.target.value)} 
-          className="w-full border border-black bg-[#D9D9D980] px-4 py-2 text-black focus:outline-none focus:ring-1 focus:ring-blue-800" 
-        />
-      </div>
 
-      <div className="mt-7 w-full text-black">
-        <input 
-          type="text"
-          value={form.address2} 
-          placeholder="Address Line 2" 
-          onChange={(e) => handleChange("address2", e.target.value)}
-          className="w-full border border-black bg-[#D9D9D980] px-4 py-2 text-black focus:outline-none focus:ring-1 focus:ring-blue-800" 
-        />
-      </div>
+      <input
+        className="w-full border border-black bg-[#D9D9D980] px-4 py-2 text-black focus:outline-none focus:ring-1 focus:ring-blue-800"
+        placeholder="Address Line 1"
+        value={propertyData.address1}
+        onChange={(e) => handle("address1", e.target.value)}
+      />
 
-      <div className="mt-7 w-full text-black">
-        <input 
-          type="text" 
-          value={form.city}
-          placeholder="City"
-          onChange={(e) => handleChange("city", e.target.value)} 
-          className="w-full border border-black bg-[#D9D9D980] px-4 py-2 text-black focus:outline-none focus:ring-1 focus:ring-blue-800" 
-        />
-      </div>
+      <input
+        className="w-full mt-7 border border-black bg-[#D9D9D980] px-4 py-2 text-black"
+        placeholder="Address Line 2"
+        value={propertyData.address2}
+        onChange={(e) => handle("address2", e.target.value)}
+      />
 
-      <div className="mt-7 w-full text-black">
-        <select 
-          value={form.state} 
-          onChange={(e) => handleChange("state", e.target.value)}
-          className="w-full h-[40px] border border-black bg-[#D9D9D980] px-4 py-2 text-black focus:outline-none focus:ring-1 focus:ring-blue-800"
-        >
-          <option value="">State</option>
-          {STATES.map((state) => (
-            <option key={state.value} value={state.value}>{state.label}</option>
-          ))}
-        </select>
-      </div>
+      <input
+        className="w-full mt-7 border border-black bg-[#D9D9D980] px-4 py-2 text-black"
+        placeholder="City"
+        value={propertyData.city}
+        onChange={(e) => handle("city", e.target.value)}
+      />
 
-      <div className="mt-7 w-full text-black">
-        <input 
-          type="text" 
-          value={form.zip}
-          placeholder="ZIP" 
-          onChange={(e) => handleChange("zip", e.target.value)}
-          className="w-full border border-black bg-[#D9D9D980] px-4 py-2 text-black focus:outline-none focus:ring-1 focus:ring-blue-800" 
-        />
-      </div>
+      <input
+        className="w-full mt-7 border border-black bg-[#D9D9D980] px-4 py-2 text-black"
+        placeholder="State"
+        value={propertyData.state}
+        onChange={(e) => handle("state", e.target.value)}
+      />
+
+      <input
+        className="w-full mt-7 border border-black bg-[#D9D9D980] px-4 py-2 text-black"
+        placeholder="ZIP"
+        value={propertyData.zip}
+        onChange={(e) => handle("zip", e.target.value)}
+      />
+
     </div>
   );
 }
