@@ -9,6 +9,8 @@ export interface PropertyData {
   zip?: string;
   propertyType?: string;
   buildingSize?: string;
+  hours?: string;
+  workers?: string;
 }
 
 interface PropertySelectorProps {
