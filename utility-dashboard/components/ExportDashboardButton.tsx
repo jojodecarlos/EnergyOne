@@ -9,6 +9,24 @@ export default function ExportDashboardButton() {
       const element = document.getElementById("dashboard-export-content");
       if (!element) return;
 
+      // Force dropdowns to reflect current selected value
+      const selects = element.querySelectorAll("select");
+
+      selects.forEach((select) => {
+        const currentValue = select.value;
+
+        Array.from(select.options).forEach((option) => {
+          if (option.value === currentValue || option.text === currentValue) {
+            option.setAttribute("selected", "selected");
+          } else {
+            option.removeAttribute("selected");
+          }
+        });
+      });
+
+      // small delay so DOM updates before capture
+      await new Promise((resolve) => setTimeout(resolve, 300));
+
       const dataUrl = await toPng(element, {
         cacheBust: true,
         pixelRatio: 2,

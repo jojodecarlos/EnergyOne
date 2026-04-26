@@ -79,7 +79,7 @@ export default function OverallPortfolioScore() {
         Overall Portfolio Score
       </h2>
       <p className="mt-1 text-center text-sm text-gray-500">
-        Score as of xx/xx/xxxx
+        Score as of {new Date().toLocaleDateString()}
       </p>
 
       <div className="mx-auto mt-6 flex w-40 items-center justify-center">
