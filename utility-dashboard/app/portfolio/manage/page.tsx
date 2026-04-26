@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, Suspense } from "react";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import DashboardHeader from "@/components/DashboardHeader";
 import PropertySelector, { PropertyData } from "@/components/PropertySelector";
 import PropertyAddressFields from "@/components/PropertyAddressFields";
@@ -31,6 +31,7 @@ type PropertyFormData = {
 
 function ManagePropertyContent() {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const urlId = searchParams.get("id");
 
   const [properties, setProperties] = useState<PropertyData[]>([]);
@@ -213,47 +214,54 @@ function ManagePropertyContent() {
       );
     }
 
-    alert("Property saved!");
+    router.push("/portfolio");
+    router.refresh;
   };
 
   const handleDelete = async () => {
-  if (!selectedPropertyId) return;
+    if (!selectedPropertyId) return;
 
-  const confirmDelete = confirm("Are you sure you want to delete this property?");
-  if (!confirmDelete) return;
+    const confirmDelete = confirm("Are you sure you want to delete this property?");
+    if (!confirmDelete) return;
 
-  const propertyId = Number(selectedPropertyId);
+    const propertyId = Number(selectedPropertyId);
 
-  // 1. Delete meters first
-  const { error: meterError } = await supabase
-    .from("meters")
-    .delete()
-    .eq("property_id", propertyId);
+    // 1. Delete meters first
+    const { error: meterError } = await supabase
+      .from("meters")
+      .delete()
+      .eq("property_id", propertyId);
 
-  if (meterError) {
-    alert(meterError.message);
-    return;
-  }
+    if (meterError) {
+      alert(meterError.message);
+      return;
+    }
 
-  // 2. Delete property
-  const { error: propertyError } = await supabase
-    .from("properties")
-    .delete()
-    .eq("id", propertyId);
+    // 2. Delete property
+    const { error: propertyError } = await supabase
+      .from("properties")
+      .delete()
+      .eq("id", propertyId);
 
-  if (propertyError) {
-    alert(propertyError.message);
-    return;
-  }
+    if (propertyError) {
+      alert(propertyError.message);
+      return;
+    }
 
-  // 3. Reset UI
-  setSelectedPropertyId(null);
-  setProperties((prev) =>
-    prev.filter((p) => p.id !== selectedPropertyId)
-  );
+    // 3. Reset UI
+    setSelectedPropertyId(null);
+    setProperties((prev) =>
+      prev.filter((p) => p.id !== selectedPropertyId)
+    );
 
-  alert("Property deleted");
-};
+    router.push("/portfolio");
+    router.refresh();
+  };
+
+  const handleCancel = async () => {
+    router.replace("/portfolio");
+  };
+
 
   return (
     <div className="flex-1 w-full max-w-7xl mx-auto p-8">
@@ -305,7 +313,7 @@ function ManagePropertyContent() {
             <PropertyActionButtons
               onSave={handleSave}
               onDelete={handleDelete}
-              onCancel={() => setSelectedPropertyId(null)}
+              onCancel={handleCancel}
             />
 
             <PropertyImageUploader
