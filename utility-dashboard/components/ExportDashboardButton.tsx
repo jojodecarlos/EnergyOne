@@ -9,7 +9,7 @@ export default function ExportDashboardButton() {
       const element = document.getElementById("dashboard-export-content");
       if (!element) return;
 
-      // Force dropdowns to reflect current selected value
+      
       const selects = element.querySelectorAll("select");
 
       selects.forEach((select) => {
@@ -24,7 +24,7 @@ export default function ExportDashboardButton() {
         });
       });
 
-      // small delay so DOM updates before capture
+      
       await new Promise((resolve) => setTimeout(resolve, 300));
 
       const dataUrl = await toPng(element, {
