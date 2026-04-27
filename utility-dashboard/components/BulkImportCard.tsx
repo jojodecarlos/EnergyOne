@@ -27,12 +27,12 @@ export default function BulkImportCard() {
 
         const formattedData = parsedData.map((row, index) => ({
           user_id: userId,
-          property_address: row.property_address || "Imported Property " + index,
-
-          // safer mapping
+          property_name: row.property_name || `Imported Property ${index + 1}`,
+          property_address:
+            row.property_address ||
+            `${row.address_line_1 || ""} ${row.address_line_2 || ""}, ${row.city || ""}, ${row.state || ""} ${row.zip || ""}`.trim(),
           building_size_sqft: Number(row.gross_floor_area || row.building_size_sqft || 0),
           primary_use_type: row.property_type || row.primary_use_type || "Unknown",
-
           weekly_operating_hours: Number(row.weekly_operating_hours || 0),
           number_of_workers: Number(row.number_of_workers || 0),
         }));
