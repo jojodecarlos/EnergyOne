@@ -16,8 +16,13 @@ import { Line } from "react-chartjs-2";
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Tooltip, Legend);
 
-export default function HistoricalTrends() {
-  const [range, setRange] = useState("Monthly");
+type HistoricalTrendsProps = {
+  range: "Monthly" | "Weekly" | "Yearly";
+  setRange: (range: "Monthly" | "Weekly" | "Yearly") => void;
+};
+
+export default function HistoricalTrends({ range, setRange }: HistoricalTrendsProps) {
+  
   const [labels, setLabels] = useState<string[]>([]);
   const [values, setValues] = useState<number[]>([]);
 
@@ -25,7 +30,6 @@ export default function HistoricalTrends() {
     console.log("HistoricalTrends effect triggered, range:", range);
     const fetchData = async () => {
       console.log("fetchData started");
-      // Fetch the active user
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
         console.log("No user found");
@@ -33,7 +37,6 @@ export default function HistoricalTrends() {
       }
       console.log("User:", user.id);
 
-      // Get user's properties first
       const { data: properties, error: propError } = await supabase
         .from("properties")
         .select("id")
@@ -159,7 +162,7 @@ export default function HistoricalTrends() {
         <h2 className="text-lg font-semibold text-black">Historical Energy Trends</h2>
         <select
           value={range}
-          onChange={(e) => setRange(e.target.value)}
+          onChange={(e) => setRange(e.target.value as "Monthly" | "Weekly" | "Yearly")}
           className="border border-gray-300 text-black rounded-md px-3 py-1 text-sm"
         >
           <option>Monthly</option>

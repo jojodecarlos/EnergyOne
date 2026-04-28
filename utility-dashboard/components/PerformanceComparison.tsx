@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Bar } from "react-chartjs-2";
-import { supabase } from "../lib/supabase";
+import { supabase } from "@/lib/supabase"; 
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -33,75 +33,62 @@ export default function PerformanceComparison({
   range,
   setRange,
 }: PerformanceComparisonProps) {
-  const [energyData, setEnergyData] = useState<
-    { name: string; usage: number }[]
-  >([]);
+  const [energyData, setEnergyData] = useState<{ name: string; usage: number }[]>([]);
 
   useEffect(() => {
-    console.log("PerformanceComparison effect triggered, range:", range);
-
     const fetchData = async () => {
-      console.log("fetchData started");
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
 
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
+      const today = new Date();
+      let startDate: string, endDate: string;
 
-      if (!user) {
-        console.log("No user");
-        return;
+      if (range === "Monthly") {
+        startDate = new Date(today.getFullYear(), today.getMonth(), 1).toISOString().split("T")[0];
+        endDate = new Date(today.getFullYear(), today.getMonth() + 1, 0).toISOString().split("T")[0];
+      } else if (range === "Weekly") {
+        const dayOfWeek = today.getDay();
+        const diffToMonday = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
+        const monday = new Date(today);
+        monday.setDate(today.getDate() + diffToMonday);
+        const sunday = new Date(monday);
+        sunday.setDate(monday.getDate() + 6);
+        startDate = monday.toISOString().split("T")[0];
+        endDate = sunday.toISOString().split("T")[0];
+      } else {
+        startDate = new Date(today.getFullYear(), 0, 1).toISOString().split("T")[0];
+        endDate = new Date(today.getFullYear(), 11, 31).toISOString().split("T")[0];
       }
-
-      console.log("User:", user.id);
 
       const { data: properties, error: propError } = await supabase
         .from("properties")
         .select("id, orlando_building_id")
         .eq("user_id", user.id);
 
-      if (propError) {
-        console.error("Properties error:", propError);
-        return;
-      }
-
-      if (!properties || properties.length === 0) {
-        console.log("No properties");
-        return;
-      }
-
-      console.log("Properties:", properties);
+      if (propError || !properties || properties.length === 0) return;
 
       const propertyIds = properties.map((p) => p.id);
-      console.log("Property IDs:", propertyIds);
-
-      const propertyId = propertyIds[0];
-      console.log("Using propertyId:", propertyId);
 
       const { data: readings, error: readingsError } = await supabase
         .from("meter_readings")
         .select("usage_amount, property_id")
-        .eq("property_id", propertyId);
-
-      console.log("Readings:", readings, "Error:", readingsError);
+        .in("property_id", propertyIds) 
+        .gte("start_date", startDate)
+        .lte("end_date", endDate);
 
       if (!readings || readings.length === 0) {
-        console.log("No readings found");
+        setEnergyData([]); 
         return;
       }
 
       const aggregated: Record<string, number> = {};
 
       readings.forEach((r) => {
-        const property = properties.find((p) => p.id === r.property_id);
-        if (!property) return;
-
         aggregated["Your Portfolio"] =
           (aggregated["Your Portfolio"] || 0) + Number(r.usage_amount);
       });
 
-      console.log("Aggregated:", aggregated);
-
-      const portfolioUsage = Object.values(aggregated)[0] || 0;
+      const portfolioUsage = aggregated["Your Portfolio"] || 0;
 
       const baselineData = [
         { name: "Residential Home", usage: portfolioUsage * 0.6 },
@@ -114,7 +101,6 @@ export default function PerformanceComparison({
         ...Object.entries(aggregated).map(([name, usage]) => ({ name, usage })),
       ];
 
-      console.log("Final energyData:", finalData);
       setEnergyData(finalData);
     };
 
