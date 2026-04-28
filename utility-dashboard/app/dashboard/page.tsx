@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import DashboardHeader from "@/components/DashboardHeader";
 import WelcomeBanner from "@/components/WelcomeBanner";
 import HistoricalTrends from "@/components/HistoricalTrends";
@@ -7,6 +10,8 @@ import PerformanceComparison from "@/components/PerformanceComparison";
 import ExportDashboardButton from "@/components/ExportDashboardButton";
 
 export default function DashboardPage() {
+  const [range, setRange] = useState<"Monthly" | "Weekly" | "Yearly">("Monthly");
+
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
       <DashboardHeader />
@@ -17,7 +22,7 @@ export default function DashboardPage() {
 
           <div className="mt-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div className="lg:col-span-2 flex flex-col gap-6">
-              <HistoricalTrends />
+              <HistoricalTrends range={range} setRange={setRange} />
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <OverallPortfolioScore />
@@ -26,7 +31,7 @@ export default function DashboardPage() {
             </div>
 
             <div className="lg:col-span-1">
-              <PerformanceComparison />
+              <PerformanceComparison range={range} setRange={setRange} />
               <ExportDashboardButton />
             </div>
           </div>

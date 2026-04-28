@@ -35,11 +35,11 @@ export default function OverallPortfolioScore() {
 
   useEffect(() => {
     const fetchScores = async () => {
-      // 1. Get the active user
+      
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      // 2. Fetch all of their scores
+      
       const { data, error } = await supabase
         .from("performance_scores")
         .select("energy_star_score")
@@ -47,7 +47,7 @@ export default function OverallPortfolioScore() {
 
       if (error || !data) return;
 
-      // 3. Calculate the average directly here instead of using the old helper
+      
       const validScores = data
         .map((d) => d.energy_star_score)
         .filter((score): score is number => typeof score === "number" && !Number.isNaN(score));
@@ -80,7 +80,7 @@ export default function OverallPortfolioScore() {
         Overall Portfolio Score
       </h2>
       <p className="mt-1 text-center text-sm text-gray-500">
-        Score as of xx/xx/xxxx
+        Score as of {new Date().toLocaleDateString()}
       </p>
 
       <div className="mx-auto mt-6 flex w-40 items-center justify-center">
