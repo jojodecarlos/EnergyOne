@@ -7,8 +7,24 @@ import { supabase } from "@/lib/supabase";
 export default function BulkImportCard() {
   const [data, setData] = useState<any[]>([]);
 
-  const handleFile = (file: File) => {
-    Papa.parse(file, {
+  const handleFile = async (file: File) => {
+    const text = await file.text();
+
+    const cleanedText = text
+      .split('\n')
+      .map(line => {
+        let t = line.trim();
+        if (t.startsWith('"') && t.endsWith('"')) {
+          const quoteCount = (t.match(/"/g) || []).length;
+          if (quoteCount === 2) {
+            return t.substring(1, t.length - 1);
+          }
+        }
+        return t;
+      })
+      .join('\n');
+
+    Papa.parse(cleanedText, {
       header: true,
       skipEmptyLines: true,
       complete: async (results) => {
@@ -73,17 +89,6 @@ export default function BulkImportCard() {
           className="hidden"
         />
       </label>
-
-      <p className="text-sm text-gray-500">
-        Upload a CSV file to import properties
-      </p>
-
-      {data.length > 0 && (
-        <p className="text-sm text-green-600 mt-2">
-          {data.length} rows loaded
-        </p>
-      )}
-
     </div>
   );
 }
