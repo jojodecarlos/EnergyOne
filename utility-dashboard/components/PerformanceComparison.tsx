@@ -24,15 +24,8 @@ ChartJS.register(
 
 type RangeOption = "Monthly" | "Weekly" | "Yearly";
 
-interface PerformanceComparisonProps {
-  range: RangeOption;
-  setRange: (range: RangeOption) => void;
-}
-
-export default function PerformanceComparison({
-  range,
-  setRange,
-}: PerformanceComparisonProps) {
+export default function PerformanceComparison() {
+  const [range, setRange] = useState<RangeOption>("Monthly");
   const [energyData, setEnergyData] = useState<{ name: string; usage: number }[]>([]);
 
   useEffect(() => {
@@ -40,67 +33,66 @@ export default function PerformanceComparison({
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      const today = new Date();
-      let startDate: string, endDate: string;
-
-      if (range === "Monthly") {
-        startDate = new Date(today.getFullYear(), today.getMonth(), 1).toISOString().split("T")[0];
-        endDate = new Date(today.getFullYear(), today.getMonth() + 1, 0).toISOString().split("T")[0];
-      } else if (range === "Weekly") {
-        const dayOfWeek = today.getDay();
-        const diffToMonday = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
-        const monday = new Date(today);
-        monday.setDate(today.getDate() + diffToMonday);
-        const sunday = new Date(monday);
-        sunday.setDate(monday.getDate() + 6);
-        startDate = monday.toISOString().split("T")[0];
-        endDate = sunday.toISOString().split("T")[0];
-      } else {
-        startDate = new Date(today.getFullYear(), 0, 1).toISOString().split("T")[0];
-        endDate = new Date(today.getFullYear(), 11, 31).toISOString().split("T")[0];
-      }
-
       const { data: properties, error: propError } = await supabase
         .from("properties")
-        .select("id, orlando_building_id")
+        .select("id, property_address, primary_use_type")
         .eq("user_id", user.id);
 
       if (propError || !properties || properties.length === 0) return;
 
       const propertyIds = properties.map((p) => p.id);
 
-      const { data: readings, error: readingsError } = await supabase
+      const { data: readings } = await supabase
         .from("meter_readings")
         .select("usage_amount, property_id")
-        .in("property_id", propertyIds) 
-        .gte("start_date", startDate)
-        .lte("end_date", endDate);
-
-      if (!readings || readings.length === 0) {
-        setEnergyData([]); 
-        return;
-      }
+        .in("property_id", propertyIds); 
 
       const aggregated: Record<string, number> = {};
 
-      readings.forEach((r) => {
-        aggregated["Your Portfolio"] =
-          (aggregated["Your Portfolio"] || 0) + Number(r.usage_amount);
+      properties.forEach((p) => {
+        let displayName = "Unnamed Property";
+        if (p.property_address && p.property_address !== "null") {
+          displayName = p.property_address;
+        } else if (p.primary_use_type && p.primary_use_type !== "null") {
+          displayName = p.primary_use_type;
+        }
+        aggregated[displayName] = 0;
       });
 
-      const portfolioUsage = aggregated["Your Portfolio"] || 0;
+      if (readings && readings.length > 0) {
+        readings.forEach((r) => {
+          const property = properties.find((p) => p.id === r.property_id);
+          if (!property) return;
+          
+          let displayName = "Unnamed Property";
+          if (property.property_address && property.property_address !== "null") {
+            displayName = property.property_address;
+          } else if (property.primary_use_type && property.primary_use_type !== "null") {
+            displayName = property.primary_use_type;
+          }
+          
+          aggregated[displayName] += Number(r.usage_amount);
+        });
+      }
+
+      let totalUsage = 0;
+      Object.values(aggregated).forEach(val => totalUsage += val);
+
+      const baseValue = totalUsage > 0 
+        ? totalUsage / properties.length 
+        : (range === "Weekly" ? 150 : range === "Monthly" ? 600 : 7200);
 
       const baselineData = [
-        { name: "Residential Home", usage: portfolioUsage * 0.6 },
-        { name: "Apartment", usage: portfolioUsage * 0.4 },
-        { name: "Bank", usage: portfolioUsage * 1.5 },
+        { name: "Normal Home", usage: baseValue * 0.6 },
+        { name: "Apartment", usage: baseValue * 0.4 },
+        { name: "Bank", usage: baseValue * 1.5 },
       ];
 
       const finalData = [
         ...baselineData,
         ...Object.entries(aggregated).map(([name, usage]) => ({ name, usage })),
       ];
-
+      
       setEnergyData(finalData);
     };
 
@@ -108,7 +100,6 @@ export default function PerformanceComparison({
   }, [range]);
 
   const labels = energyData.map((e) => e.name);
-
   const colors = [
     "#facd03",
     "#4F46E5",
@@ -123,7 +114,7 @@ export default function PerformanceComparison({
     labels,
     datasets: [
       {
-        label: `Energy Usage (${range})`,
+        label: `Energy Usage (Lifetime)`,
         data: energyData.map((e) => e.usage),
         backgroundColor: labels.map((_, i) => colors[i % colors.length]),
       },
@@ -134,7 +125,7 @@ export default function PerformanceComparison({
     responsive: true,
     plugins: {
       legend: { display: false },
-      title: { display: true, text: `Performance Comparison (${range})` },
+      title: { display: true, text: `Performance Comparison (All-Time)` },
     },
   };
 
@@ -144,7 +135,6 @@ export default function PerformanceComparison({
         <h2 className="text-black text-[30px] w-[231px] font-md font-Outfit">
           Performance Comparison
         </h2>
-
         <select
           value={range}
           onChange={(e) => setRange(e.target.value as RangeOption)}
@@ -155,7 +145,7 @@ export default function PerformanceComparison({
           <option>Yearly</option>
         </select>
       </div>
-
+      
       <Bar data={data} options={options} />
     </div>
   );
