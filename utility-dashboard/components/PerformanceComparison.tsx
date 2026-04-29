@@ -24,8 +24,16 @@ ChartJS.register(
 
 type RangeOption = "Monthly" | "Weekly" | "Yearly";
 
-export default function PerformanceComparison() {
-  const [range, setRange] = useState<RangeOption>("Monthly");
+interface PerformanceComparisonProps {
+  range: RangeOption;
+  setRange: (range: RangeOption) => void;
+}
+
+export default function PerformanceComparison({
+  range,
+  setRange,
+}: PerformanceComparisonProps) {
+  
   const [energyData, setEnergyData] = useState<{ name: string; usage: number }[]>([]);
 
   useEffect(() => {
